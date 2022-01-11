@@ -13,7 +13,7 @@ rm -rf $TEMP_TRACE_PATH
 CURRENT_CMD=$@
 
 # 设置 trace
-echo /dev/null > $DPAT/trace
+echo /dev/null > $DPATH/trace
 echo nop > $DPATH/current_tracer
 echo 0 > $DPATH/tracing_on
 # 设置要使用哪种 trace
