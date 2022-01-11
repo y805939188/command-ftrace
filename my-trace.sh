@@ -48,19 +48,20 @@ if [ ! -n "$CURRENT_CMD" ]; then
 fi
 
 # 设置 trace
-echo /dev/null > $DPATH/trace
+echo "" > $DPATH/trace
 echo nop > $DPATH/current_tracer
 echo 0 > $DPATH/tracing_on
-echo "" > $DPATH/set_ftrace_filter
+# echo "" > $DPATH/set_ftrace_filter
 # 设置要使用哪种 trace
 echo function_graph > $DPATH/current_tracer
+# 设置过滤条件, 如果有的话
+if [ "$FILTER_PARAMS" ]; then
+  echo $FILTER_PARAMS > $DPATH/set_ftrace_filter
+fi
 
 # 创建一个新的临时脚本用来执行命令
 # 把要执行的脚本的 PID 设置给 tracer
 echo "echo \$\$ > $DPATH/set_ftrace_pid" > $TEMP_CMD_PATH
-if [ "$FILTER_PARAMS" ]; then
-  echo "echo $FILTER_PARAMS > $DPATH/set_ftrace_filter" > $TEMP_CMD_PATH
-fi
 echo "echo \"当前进程是 \$\$\"" >> $TEMP_CMD_PATH
 # 启动 tracer
 echo "echo 1 > $DPATH/tracing_on" >> $TEMP_CMD_PATH
@@ -72,7 +73,7 @@ chmod u+x $TEMP_CMD_PATH
 $TEMP_CMD_PATH $CURRENT_CMD
 
 # 输出 trace 日志
-`cat /$DPATH/trace > $TEMP_TRACE_PATH`
+`cat $DPATH/trace > $TEMP_TRACE_PATH`
 rm -rf $TEMP_CMD_PATH
 echo -e "\033[32m 输出 trace 日志路径是 $TEMP_TRACE_PATH \033[0m"
 # echo "输出 trace 日志路径是 $TEMP_TRACE_PATH"
